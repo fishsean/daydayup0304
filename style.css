@@ -1,0 +1,404 @@
+/* ================================================
+   Reset
+   ================================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ================================================
+   Body
+   ================================================ */
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: #07070f;
+    font-family: -apple-system, "PingFang SC", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+    color: #fff;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 全局噪点 */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.028;
+    pointer-events: none;
+    z-index: 9000;
+}
+
+/* ================================================
+   Halo 光晕
+   ================================================ */
+.halo {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    transition: background 0.8s ease;
+    animation: haloBreathe 5.5s ease-in-out infinite;
+}
+
+@keyframes haloBreathe {
+    0%, 100% { opacity: 1;   transform: scale(1);    }
+    50%       { opacity: 0.7; transform: scale(1.08); }
+}
+
+/* ================================================
+   Top Bar
+   ================================================ */
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4.5vh 6vw 0;
+    animation: topIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes topIn {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0);     }
+}
+
+.counter {
+    font-size: clamp(0.52rem, 1.3vw, 0.65rem);
+    font-weight: 500;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.32);
+}
+
+.date-label {
+    font-size: clamp(0.56rem, 1.4vw, 0.7rem);
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.48);
+}
+
+/* ================================================
+   Deck（卡片容器）
+   ================================================ */
+.deck {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 14vh 0 18vh;
+    padding-left: calc((100vw - clamp(300px, 82vw, 440px)) / 2);
+    gap: 24px;
+    overflow: visible;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+}
+
+/* ================================================
+   Card
+   ================================================ */
+.card {
+    position: relative;
+    flex-shrink: 0;
+    width: clamp(300px, 82vw, 440px);
+    aspect-ratio: 0.7;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 2.2rem 1.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.4s ease,
+                border-color 0.4s ease,
+                box-shadow 0.4s ease;
+    cursor: grab;
+    user-select: none;
+    opacity: 0.4;
+    transform: scale(0.92);
+}
+
+.card.active {
+    opacity: 1;
+    transform: scale(1);
+    border-color: rgba(255, 255, 255, 0.16);
+    /* box-shadow 由 JS 注入（accent 颜色） */
+}
+
+.card:not(.active) {
+    pointer-events: none;
+}
+
+.card:active { cursor: grabbing; }
+
+/* ================================================
+   Card Header
+   ================================================ */
+.card-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.card-num {
+    font-size: clamp(4.5rem, 14vw, 7rem);
+    font-weight: 200;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    margin-bottom: 0.8rem;
+    color: rgba(255, 255, 255, 0.95);
+    /* text-shadow 由 JS 注入 */
+    transition: text-shadow 0.7s ease;
+}
+
+.card-meta {
+    font-size: clamp(0.6rem, 1.5vw, 0.75rem);
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.58);
+}
+
+/* ================================================
+   Card Body（未打卡 / 已打卡两种状态）
+   ================================================ */
+.card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 1.2rem;
+}
+
+/* 打卡按钮（未打卡时显示） */
+.check-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(64px, 18vw, 88px);
+    height: clamp(64px, 18vw, 88px);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    transition: background 0.3s, border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    /* box-shadow 由 JS 注入（accent） */
+}
+
+.check-btn:hover {
+    background: rgba(255, 255, 255, 0.13);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: scale(1.08);
+}
+
+.check-btn:active { transform: scale(0.95); }
+
+/* 打卡图标 */
+.check-ico {
+    width: 42%;
+    height: 42%;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.75);
+    position: relative;
+}
+
+.check-ico::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* 提示文字 */
+.check-tip {
+    font-size: clamp(0.66rem, 1.6vw, 0.82rem);
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.52);
+    animation: tipBlink 3.2s ease-in-out infinite;
+}
+
+@keyframes tipBlink {
+    0%, 100% { opacity: 1;   }
+    50%       { opacity: 0.2; }
+}
+
+/* 语录（打卡后显示） */
+.quote {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+    width: 100%;
+    text-align: center;
+}
+
+.quote.show { display: flex; }
+
+.q-ln {
+    font-size: clamp(1.05rem, 2.9vw, 1.5rem);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    line-height: 1.75;
+    color: rgba(255, 255, 255, 0.92);
+    opacity: 0;
+    transform: translateY(20px);
+    /* text-shadow 由 JS 注入 */
+    transition: text-shadow 0.7s ease;
+}
+
+.q-ln.anim {
+    animation: qIn 0.68s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s) both;
+}
+
+.q-ln.still {
+    opacity: 1;
+    transform: none;
+}
+
+@keyframes qIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ================================================
+   Card Footer
+   ================================================ */
+.card-foot {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: clamp(0.58rem, 1.4vw, 0.7rem);
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.38);
+}
+
+.card-foot svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0.38;
+}
+
+/* ================================================
+   Nav Dots（导航点）
+   ================================================ */
+.nav-dots {
+    position: fixed;
+    bottom: 10vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.8rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    animation: dotsIn 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+@keyframes dotsIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0);    }
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    transition: background 0.3s, transform 0.3s, width 0.3s;
+    cursor: pointer;
+}
+
+.dot.active {
+    width: 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.dot:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(1.3);
+}
+
+/* ================================================
+   Hint 底部提示
+   ================================================ */
+.hint {
+    position: fixed;
+    bottom: 4vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    font-size: clamp(0.52rem, 1.25vw, 0.64rem);
+    letter-spacing: 0.22em;
+    color: rgba(255, 255, 255, 0.18);
+    animation: hintIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both,
+               hintBlink 3.5s ease-in-out 2s infinite;
+}
+
+@keyframes hintIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0);   }
+}
+
+@keyframes hintBlink {
+    0%, 100% { opacity: 1;   }
+    50%       { opacity: 0.1; }
+}
+
+/* ================================================
+   Particles（打卡粒子）
+   ================================================ */
+.pt {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    animation: ptFly 0.75s cubic-bezier(0, 0.8, 0.5, 1) forwards;
+}
+
+@keyframes ptFly {
+    to { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.1); }
+}
+
+/* ================================================
+   Ripple（打卡涟漪）
+   ================================================ */
+.rip {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%) scale(0);
+    animation: ripOut 0.95s ease-out forwards;
+}
+
+@keyframes ripOut {
+    to { transform: translate(-50%, -50%) scale(70); opacity: 0; }
+}

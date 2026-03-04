@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日日签</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 每日光晕 -->
+    <div class="halo" id="halo"></div>
+
+    <!-- 顶部计数器 -->
+    <div class="top-bar">
+        <p class="counter" id="counter"></p>
+        <p class="date-label" id="date-label"></p>
+    </div>
+
+    <!-- 卡片容器（可左右滑动） -->
+    <div class="deck" id="deck">
+        <!-- 卡片由 JS 动态生成 -->
+    </div>
+
+    <!-- 导航指示器 -->
+    <div class="nav-dots" id="nav-dots"></div>
+
+    <!-- 底部引导文字 -->
+    <p class="hint" id="hint">左右滑动查看更多</p>
+
+    <script src="script.js"></script>
+</body>
+</html>
